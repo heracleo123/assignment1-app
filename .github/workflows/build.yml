@@ -11,7 +11,7 @@ jobs:
   build-webapp:
     runs-on: ubuntu-latest
     env:
-      ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+      ECR_REGISTRY: 692131107972.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
       ECR_REPOSITORY_WEBAPP: assignment1-webapp
       ECR_REPOSITORY_MYSQL: assignment1-mysql
       AWS_REGION: ${{ secrets.AWS_REGION }}
