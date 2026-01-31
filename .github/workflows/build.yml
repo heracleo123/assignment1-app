@@ -1,4 +1,4 @@
-name: Build and Push to ECR
+name: Build and Push Docker Images to ECR
 
 on:
   push:
@@ -7,15 +7,20 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-push:
+  build-webapp:
     runs-on: ubuntu-latest
+    env:
+      ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+      ECR_REPOSITORY_WEBAPP: assignment1-webapp
+      ECR_REPOSITORY_MYSQL: assignment1-mysql
+      AWS_REGION: ${{ secrets.AWS_REGION }}
     
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
     
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -25,24 +30,29 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
     
-    - name: Build and push webapp image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: webapp
-        IMAGE_TAG: ${{ github.sha }}
+    - name: Build webapp Docker image
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_WEBAPP:latest .
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY_WEBAPP:latest $ECR_REGISTRY/$ECR_REPOSITORY_WEBAPP:${{ github.sha }}
     
-    - name: Build and push mysql image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: mysql
-        IMAGE_TAG: ${{ github.sha }}
+    - name: Build MySQL Docker image
       run: |
-        docker build -f Dockerfile_mysql -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        cd mysql
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL:latest .
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL:latest $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL:${{ github.sha }}
+        cd ..
+    
+    - name: Push webapp image to ECR
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_WEBAPP:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_WEBAPP:${{ github.sha }}
+    
+    - name: Push MySQL image to ECR
+      run: |
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL:${{ github.sha }}
+    
+    - name: Output ECR URLs
+      run: |
+        echo "Webapp ECR URL: $ECR_REGISTRY/$ECR_REPOSITORY_WEBAPP"
+        echo "MySQL ECR URL: $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL"
