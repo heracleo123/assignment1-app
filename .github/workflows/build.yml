@@ -37,7 +37,7 @@ jobs:
     - name: Build and Push Web App
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY_WEBAPP: assignment1-webapp
+        ECR_REPOSITORY_WEBAPP: webapp
       run: |
         # Build webapp - adjust path as needed
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_WEBAPP:latest .
@@ -46,7 +46,7 @@ jobs:
     - name: Build and Push MySQL
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY_MYSQL: assignment1-mysql
+        ECR_REPOSITORY_MYSQL: mysql
       run: |
         # Check different possible locations
         if [ -f "mysql/Dockerfile" ]; then
