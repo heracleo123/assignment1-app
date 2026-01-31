@@ -56,3 +56,6 @@ jobs:
       run: |
         echo "Webapp ECR URL: $ECR_REGISTRY/$ECR_REPOSITORY_WEBAPP"
         echo "MySQL ECR URL: $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL"
+
+
+
