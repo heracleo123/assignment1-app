@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 
-=======
->>>>>>> development
 name: Deploy to ECR
 
 on: 
