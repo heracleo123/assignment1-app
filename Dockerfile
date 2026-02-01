@@ -9,5 +9,9 @@ RUN set -xe \
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 EXPOSE 8080
+<<<<<<< HEAD
 ENTRYPOINT [ "python3" ]
 CMD [ "app.py" ]
+=======
+CMD ["python3", "app.py"]
+>>>>>>> development
