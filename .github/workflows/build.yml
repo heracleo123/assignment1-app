@@ -50,12 +50,12 @@ jobs:
         ECR_REPOSITORY_MYSQL: mysql
       run: |
         # Check different possible locations
-        if [ -f "mysql/Dockerfile" ]; then
+        if [ -f "Dockerfile_mysql" ]; then
+          echo "Building MySQL from Dockerfile_mysql"
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL:latest -f Dockerfile_mysql .
+        elif [ -f "mysql/Dockerfile" ]; then
           echo "Building MySQL from mysql/ directory"
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL:latest ./mysql
-        elif [ -f "Dockerfile.mysql" ]; then
-          echo "Building MySQL from Dockerfile.mysql"
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_MYSQL:latest -f Dockerfile.mysql .
         else
           echo "MySQL Dockerfile not found in expected locations"
           exit 0  # Don't fail, just skip
